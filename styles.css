@@ -1,0 +1,107 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.video-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1; 
+    width: 100%;
+    position: relative; 
+}
+
+.video-slot {
+    position: static; /* Default value */
+    opacity: 1; /* Default value */
+    flex: 1;
+    height: auto; /* Adjust according to your need */
+    width: 100%; /* Adjust according to your need */
+}
+
+
+.video-slot .video-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+.video-slot .video-wrapper {
+    position: relative;
+    height: 0;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+}
+
+.video-slot #video1,
+.video-slot #video2,
+.video-slot video,
+.video-slot iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+hr {
+    margin: 10px 0; /* Adjust margin for hr elements */
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 50px;
+    background-color: #333;
+    width: 100%;
+}
+
+.controls .left-controls,
+.controls .right-controls {
+    display: flex;
+    align-items: center;
+}
+
+.controls button {
+    margin: 0 5px;
+}
+
+
+#playPause, .playPause {
+    margin: 0 5px;
+}
+
+body {
+    background-color: #222;
+    color: #fff;
+    font-family: Arial, sans-serif;
+}
+  
+button,
+input[type="text"],
+input[type="file"] {
+    display: block;
+    margin: 10px 0; /* Adjust margin to inputs and hr */
+    padding: 10px;
+    max-width: 90%;
+    font-size: 16px;
+}
+
+button {
+    color: #222;
+    background-color: #4caf50;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}

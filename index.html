@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <script src="https://www.youtube.com/iframe_api"></script>
+</head>
+
+<body>
+    <div class="video-container">
+        <div class="video-slot">
+            <div class="video-content">
+                <div class="video-wrapper">
+                    <div id="video1"></div>
+                </div>
+                <hr>
+                <input type="text" id="youtubeLink1" placeholder="YouTube linkki 1">
+                <input type="file" id="fileUpload1" accept="video/*,video/x-matroska">
+            </div>
+        </div>
+        
+        <div class="video-slot">
+            <div class="video-content">
+                <div class="video-wrapper">
+                    <div id="video2"></div>
+                </div>
+                <hr>
+                <input type="text" id="youtubeLink2" placeholder="YouTube linkki 2">
+                <input type="file" id="fileUpload2" accept="video/*,video/x-matroska">
+            </div>
+        </div>
+    </div>
+    
+    <div class="controls">
+        <div class="left-controls">
+            <button id="backward1">-1 frame</button>
+            <button id="playPause1">pause/play</button>
+            <button id="forward1">+1 frame</button>
+            <button id="sync1" class="playPause">Sync video 2 to 1</button>
+        </div>
+        <button id="playPause">Play/Pause</button>
+        <div class="right-controls">
+            <button id="sync2" class="playPause">Sync video 1 to 2</button>
+            <button id="backward2">-1 frame</button>
+            <button id="playPause2">pause/play</button>
+            <button id="forward2">+1 frame</button>
+        </div>
+        <button id="toggle" class="playPause">Toggle</button>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
