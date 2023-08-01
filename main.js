@@ -92,19 +92,26 @@ function createFileVideo(file, slotNumber) {
 }
 
 function playPauseVideo(player, playerType) {
-    if (playerType === 'youtube') {
-        if (player.getPlayerState() === YT.PlayerState.PLAYING) {
-            player.pauseVideo();
-        } else {
-            player.playVideo();
-        }
-    } else { // HTML5 video
-        if (player.paused) {
-            player.play();
-        } else {
-            player.pause();
-        }
-    }
+  if (playerType === 'youtube') {
+      if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+          return new Promise(resolve => {
+              player.pauseVideo();
+              resolve();
+          });
+      } else {
+          return new Promise(resolve => {
+              player.playVideo();
+              resolve();
+          });
+      }
+  } else { // HTML5 video
+      if (player.paused) {
+          return player.play();
+      } else {
+          player.pause();
+          return Promise.resolve();
+      }
+  }
 }
 
 function syncVideos(sourcePlayer, sourcePlayerType, targetPlayer, targetPlayerType) {
@@ -123,9 +130,10 @@ function syncVideos(sourcePlayer, sourcePlayerType, targetPlayer, targetPlayerTy
 }
 
 document.getElementById('playPause').addEventListener('click', function() { 
-    playPauseVideo(player1, player1Type);
-    playPauseVideo(player2, player2Type);
-    updatePlayPauseButton();
+  Promise.all([
+      playPauseVideo(player1, player1Type),
+      playPauseVideo(player2, player2Type)
+  ]).then(() => updatePlayPauseButton());
 });
 
 document.getElementById('sync1').addEventListener('click', function() {
