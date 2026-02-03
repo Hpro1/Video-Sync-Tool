@@ -1,52 +1,69 @@
 <!DOCTYPE html>
-<html>
+<html lang="fi">
 <head>
-    <link rel="stylesheet" type="text/css" href="styles.css">
-    <script src="https://www.youtube.com/iframe_api"></script>
+  <meta charset="UTF-8">
+  <title>Dual Video Sync</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 
 <body>
-    <div class="video-container">
-        <div class="video-slot">
-            <div class="video-content">
-                <div class="video-wrapper">
-                    <div id="video1"></div>
-                </div>
-                <hr>
-                <input type="text" id="youtubeLink1" placeholder="YouTube linkki 1">
-                <input type="file" id="fileUpload1" accept="video/*,video/x-matroska">
-            </div>
-        </div>
-        
-        <div class="video-slot">
-            <div class="video-content">
-                <div class="video-wrapper">
-                    <div id="video2"></div>
-                </div>
-                <hr>
-                <input type="text" id="youtubeLink2" placeholder="YouTube linkki 2">
-                <input type="file" id="fileUpload2" accept="video/*,video/x-matroska">
-            </div>
-        </div>
-    </div>
-    
-    <div class="controls">
-        <div class="left-controls">
-            <button id="backward1">-1 frame</button>
-            <button id="playPause1">pause/play</button>
-            <button id="forward1">+1 frame</button>
-            <button id="sync1" class="playPause">Sync video 2 to 1</button>
-        </div>
-        <button id="playPause">Play/Pause</button>
-        <div class="right-controls">
-            <button id="sync2" class="playPause">Sync video 1 to 2</button>
-            <button id="backward2">-1 frame</button>
-            <button id="playPause2">pause/play</button>
-            <button id="forward2">+1 frame</button>
-        </div>
-        <button id="toggle" class="playPause">Toggle</button>
+
+<div class="video-container">
+
+  <!-- LEFT -->
+  <div class="video-slot" id="slot1">
+    <div class="video-wrapper">
+      <div id="video1"></div>
     </div>
 
-    <script src="main.js"></script>
+    <div class="video-inputs">
+      <input type="text" id="youtubeLink1" placeholder="YouTube linkki">
+      <input type="file" id="fileUpload1" accept="video/*">
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="video-slot" id="slot2">
+    <div class="video-wrapper">
+      <div id="video2"></div>
+    </div>
+
+    <div class="video-inputs">
+      <input type="text" id="youtubeLink2" placeholder="YouTube linkki">
+      <input type="file" id="fileUpload2" accept="video/*">
+    </div>
+  </div>
+
+</div>
+
+<!-- CONTROLS -->
+<div class="controls">
+
+  <div class="side-controls">
+    <button id="minus1_left">-1s</button>
+    <button id="playPause1">Play/Pause</button>
+    <button id="plus1_left">+1s</button>
+    <button id="zoom1">Zoom</button>
+  </div>
+
+  <div class="center-controls">
+    <button id="minus3">-3s</button>
+    <button id="minus1">-1s</button>
+    <button id="playPauseMain" class="big">PLAY</button>
+    <button id="plus1">+1s</button>
+    <button id="plus3">+3s</button>
+  </div>
+
+  <div class="side-controls">
+    <button id="zoom2">Zoom</button>
+    <button id="minus1_right">-1s</button>
+    <button id="playPause2">Play/Pause</button>
+    <button id="plus1_right">+1s</button>
+  </div>
+
+</div>
+
+<script src="main.js"></script>
 </body>
 </html>

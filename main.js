@@ -1,210 +1,170 @@
-var player1, player2;
-var player1Type = 'youtube'; // Possible values: 'youtube', 'html5'
-var player2Type = 'youtube'; // Possible values: 'youtube', 'html5'
-var layoutIsToggled = false;
+let player1, player2;
+let player1Type = "youtube";
+let player2Type = "youtube";
 
-document.getElementById('toggle').addEventListener('click', function() {
-    var videoSlots = document.querySelectorAll('.video-slot');
+let zoom1 = false;
+let zoom2 = false;
 
-    if (!layoutIsToggled) {
-        videoSlots.forEach(function(slot) {
-            slot.style.position = 'absolute';
-            slot.style.opacity = '0.5';
-            slot.style.width = '70%';
-            slot.style.height = '100%';
-        });
-    } else {
-        videoSlots.forEach(function(slot) {
-            slot.style.position = 'static';
-            slot.style.opacity = '1';
-            slot.style.width = '100%';
-            slot.style.height = 'auto';
-        });
-    }
+let objUrl1 = null;
+let objUrl2 = null;
 
-    layoutIsToggled = !layoutIsToggled;
-});
-
-function onYouTubeIframeAPIReady() {
-  player1 = new YT.Player('video1', {
-    playerVars: {
-      'autoplay': 0,
-    },
-    events: {
-      'onReady': onPlayerReady,
-    }
-  });
-
-  player2 = new YT.Player('video2', {
-    playerVars: {
-      'autoplay': 0,
-    },
-    events: {
-      'onReady': onPlayerReady,
-    }
-  });
+function bind(id, fn){
+  const el = document.getElementById(id);
+  if(el) el.onclick = fn;
 }
 
-function onPlayerReady(event) {
-  // Handle player ready event if necessary
+/* YOUTUBE INIT */
+
+function onYouTubeIframeAPIReady(){
+
+  player1 = new YT.Player("video1", {
+    playerVars:{ autoplay:0, mute:1 }
+  });
+
+  player2 = new YT.Player("video2", {
+    playerVars:{ autoplay:0, mute:1 }
+  });
+
 }
 
-document.getElementById('youtubeLink1').addEventListener('change', function() {
-  var videoId = this.value.split('v=')[1];
-  player1.cueVideoById(videoId);
-  player1Type = 'youtube';
-});
+/*  HELPERS*/
 
-document.getElementById('youtubeLink2').addEventListener('change', function() {
-  var videoId = this.value.split('v=')[1];
-  player2.cueVideoById(videoId);
-  player2Type = 'youtube';
-});
+function extractYouTubeId(url){
+  try{
+    const u = new URL(url);
 
-document.getElementById('fileUpload1').addEventListener('change', function() {
-  var file = this.files[0];
-  createFileVideo(file, 1);
-});
+    if(u.hostname === "youtu.be")
+      return u.pathname.slice(1);
 
-document.getElementById('fileUpload2').addEventListener('change', function() {
-  var file = this.files[0];
-  createFileVideo(file, 2);
-});
+    if(u.hostname.includes("youtube.com")){
+      if(u.pathname === "/watch")
+        return u.searchParams.get("v");
 
-function createFileVideo(file, slotNumber) {
-  const video = document.createElement('video');
-  video.src = URL.createObjectURL(file);
+      return u.pathname.split("/").pop();
+    }
+
+  }catch{}
+
+  return null;
+}
+
+function getTime(p,t){
+  return t==="youtube" ? p.getCurrentTime() : p.currentTime;
+}
+
+function seek(p,t,time){
+  if(time<0) time=0;
+  if(t==="youtube") p.seekTo(time,true);
+  else p.currentTime = time;
+}
+
+function play(p,t){
+  if(t==="youtube") p.playVideo();
+  else p.play();
+}
+
+function pause(p,t){
+  if(t==="youtube") p.pauseVideo();
+  else p.pause();
+}
+
+function togglePlay(p,t){
+  if(t==="youtube"){
+    if(p.getPlayerState()===1) p.pauseVideo();
+    else p.playVideo();
+  } else {
+    if(p.paused) p.play();
+    else p.pause();
+  }
+}
+
+/* FILE LOAD */
+
+function loadFile(file,slot){
+
+  const video = document.createElement("video");
   video.controls = true;
-  video.style.width = '100%';
-  video.style.height = '100%';
-  
-  const wrapper = document.querySelector(`.video-slot:nth-of-type(${slotNumber}) .video-wrapper`);
-  wrapper.innerHTML = '';
-  wrapper.appendChild(video);
+  video.muted = true;
 
-  if(slotNumber === 1) {
+  if(slot===1){
+    if(objUrl1) URL.revokeObjectURL(objUrl1);
+    objUrl1 = URL.createObjectURL(file);
+    video.src = objUrl1;
+
     player1 = video;
-    player1Type = 'html5';
-  } else if(slotNumber === 2) {
+    player1Type = "html5";
+
+    zoom1=false;
+    video.classList.remove("zoomed");
+
+  } else {
+
+    if(objUrl2) URL.revokeObjectURL(objUrl2);
+    objUrl2 = URL.createObjectURL(file);
+    video.src = objUrl2;
+
     player2 = video;
-    player2Type = 'html5';
+    player2Type = "html5";
+
+    zoom2=false;
+    video.classList.remove("zoomed");
   }
+
+  document.querySelector(`#slot${slot} .video-wrapper`).innerHTML="";
+  document.querySelector(`#slot${slot} .video-wrapper`).appendChild(video);
 }
 
-function playPauseVideo(player, playerType) {
-  if (playerType === 'youtube') {
-      if (player.getPlayerState() === YT.PlayerState.PLAYING) {
-          return new Promise(resolve => {
-              player.pauseVideo();
-              resolve();
-          });
-      } else {
-          return new Promise(resolve => {
-              player.playVideo();
-              resolve();
-          });
-      }
-  } else { // HTML5 video
-      if (player.paused) {
-          return player.play();
-      } else {
-          player.pause();
-          return Promise.resolve();
-      }
-  }
+/* INPUTS */
+
+document.getElementById("youtubeLink1").onchange = e=>{
+  const id = extractYouTubeId(e.target.value);
+  if(id){ player1.cueVideoById(id); player1Type="youtube"; }
+};
+
+document.getElementById("youtubeLink2").onchange = e=>{
+  const id = extractYouTubeId(e.target.value);
+  if(id){ player2.cueVideoById(id); player2Type="youtube"; }
+};
+
+document.getElementById("fileUpload1").onchange = e=> loadFile(e.target.files[0],1);
+document.getElementById("fileUpload2").onchange = e=> loadFile(e.target.files[0],2);
+
+/*  BOTH SHIFT  */
+
+function shiftBoth(sec){
+  seek(player1,player1Type,getTime(player1,player1Type)+sec);
+  seek(player2,player2Type,getTime(player2,player2Type)+sec);
 }
 
-function syncVideos(sourcePlayer, sourcePlayerType, targetPlayer, targetPlayerType) {
-    var currentTimestamp;
-    if (sourcePlayerType === 'youtube') {
-        currentTimestamp = sourcePlayer.getCurrentTime();
-    } else { // HTML5 video
-        currentTimestamp = sourcePlayer.currentTime;
-    }
+/*  BUTTONS  */
 
-    if (targetPlayerType === 'youtube') {
-        targetPlayer.seekTo(currentTimestamp);
-    } else { // HTML5 video
-        targetPlayer.currentTime = currentTimestamp;
-    }
-}
-
-document.getElementById('playPause').addEventListener('click', function() { 
-  Promise.all([
-      playPauseVideo(player1, player1Type),
-      playPauseVideo(player2, player2Type)
-  ]).then(() => updatePlayPauseButton());
+bind("playPauseMain", ()=>{
+  togglePlay(player1,player1Type);
+  togglePlay(player2,player2Type);
 });
 
-document.getElementById('sync1').addEventListener('click', function() {
-    syncVideos(player1, player1Type, player2, player2Type);
+bind("playPause1", ()=> togglePlay(player1,player1Type));
+bind("playPause2", ()=> togglePlay(player2,player2Type));
+
+bind("minus3", ()=> shiftBoth(-3));
+bind("minus1", ()=> shiftBoth(-1));
+bind("plus1", ()=> shiftBoth(1));
+bind("plus3", ()=> shiftBoth(3));
+
+bind("minus1_left", ()=> seek(player1,player1Type,getTime(player1,player1Type)-1));
+bind("plus1_left", ()=> seek(player1,player1Type,getTime(player1,player1Type)+1));
+
+bind("minus1_right", ()=> seek(player2,player2Type,getTime(player2,player2Type)-1));
+bind("plus1_right", ()=> seek(player2,player2Type,getTime(player2,player2Type)+1));
+
+bind("zoom1", ()=>{
+  if(player1Type!=="html5") return;
+  zoom1=!zoom1;
+  player1.classList.toggle("zoomed",zoom1);
 });
 
-document.getElementById('sync2').addEventListener('click', function() {
-    syncVideos(player2, player2Type, player1, player1Type);
+bind("zoom2", ()=>{
+  if(player2Type!=="html5") return;
+  zoom2=!zoom2;
+  player2.classList.toggle("zoomed",zoom2);
 });
-
-function updatePlayPauseButton() {
-    var isPlaying = false;
-    
-    if (player1Type === 'youtube') {
-        isPlaying = player1.getPlayerState() === YT.PlayerState.PLAYING;
-    } else { // HTML5 video
-        isPlaying = !player1.paused;
-    }
-    
-    if (player2Type === 'youtube') {
-        isPlaying = isPlaying || player2.getPlayerState() === YT.PlayerState.PLAYING;
-    } else { // HTML5 video
-        isPlaying = isPlaying || !player2.paused;
-    }
-    
-    var playPauseButton = document.getElementById('playPause');
-    if (isPlaying) {
-        playPauseButton.style.backgroundColor = "#45a049";
-    } else {
-        playPauseButton.style.backgroundColor = "#4caf50";
-    }
-}
-
-document.getElementById('backward1').addEventListener('click', function() { 
-  // 1 frame = 1 / frame rate
-  // Assuming frame rate is 30 fps
-  var currentTime = player1Type === 'youtube' ? player1.getCurrentTime() : player1.currentTime;
-  var newTime = currentTime - 1/60;
-  seekToTime(player1, player1Type, newTime);
-});
-
-document.getElementById('backward2').addEventListener('click', function() { 
-  var currentTime = player2Type === 'youtube' ? player2.getCurrentTime() : player2.currentTime;
-  var newTime = currentTime - 1/60;
-  seekToTime(player2, player2Type, newTime);
-});
-
-document.getElementById('forward1').addEventListener('click', function() { 
-  var currentTime = player1Type === 'youtube' ? player1.getCurrentTime() : player1.currentTime;
-  var newTime = currentTime + 1/60;
-  seekToTime(player1, player1Type, newTime);
-});
-
-document.getElementById('forward2').addEventListener('click', function() { 
-  var currentTime = player2Type === 'youtube' ? player2.getCurrentTime() : player2.currentTime;
-  var newTime = currentTime + 1/60;
-  seekToTime(player2, player2Type, newTime);
-});
-
-document.getElementById('playPause1').addEventListener('click', function() { 
-  playPauseVideo(player1, player1Type);
-});
-
-document.getElementById('playPause2').addEventListener('click', function() { 
-  playPauseVideo(player2, player2Type);
-});
-
-function seekToTime(player, playerType, time) {
-  if (playerType === 'youtube') {
-      player.seekTo(time);
-  } else { // HTML5 video
-      player.currentTime = time;
-  }
-}
