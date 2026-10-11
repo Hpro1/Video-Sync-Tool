@@ -8,6 +8,10 @@ let zoom2 = false;
 let objUrl1 = null;
 let objUrl2 = null;
 
+const FRAME_RATE = 60;
+const FRAME = 1 / FRAME_RATE;
+
+
 function bind(id, fn){
   const el = document.getElementById(id);
   if(el) el.onclick = fn;
@@ -77,6 +81,12 @@ function togglePlay(p,t){
     else p.pause();
   }
 }
+
+function stepFrame(player, type, dir){
+  const t = getTime(player,type) + FRAME * dir;
+  seek(player,type,t);
+}
+
 
 /* FILE LOAD */
 
@@ -156,6 +166,13 @@ bind("plus1_left", ()=> seek(player1,player1Type,getTime(player1,player1Type)+1)
 
 bind("minus1_right", ()=> seek(player2,player2Type,getTime(player2,player2Type)-1));
 bind("plus1_right", ()=> seek(player2,player2Type,getTime(player2,player2Type)+1));
+
+bind("frameBack1", ()=> stepFrame(player1, player1Type, -1));
+bind("frameForward1", ()=> stepFrame(player1, player1Type, 1));
+
+bind("frameBack2", ()=> stepFrame(player2, player2Type, -1));
+bind("frameForward2", ()=> stepFrame(player2, player2Type, 1));
+
 
 bind("zoom1", ()=>{
   if(player1Type!=="html5") return;

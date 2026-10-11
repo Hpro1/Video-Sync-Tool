@@ -75,3 +75,14 @@ button.big{
   font-size:20px;
   padding:10px 20px;
 }
+
+button.blue{
+  background:#2196f3;
+  color:white;
+}
+
+button.blue{
+  background:#2196f3;
+  color:black;
+}
+
